@@ -1,0 +1,24 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: argocd-deploy-permission
+  namespace: prod
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: deploy prod
+  sourceRepos:
+    - "https://github.com/wachira90/xxxxx.git"
+  destinations:
+    - namespace: "prod"
+      server: "https://kubernetes.default.svc"
+  clusterResourceWhitelist:
+    - group: ""
+      kind: "Service"
+    - group: "apps"
+      kind: "Deployment"
+    - group: "autoscaling"
+      kind: "HorizontalPodAutoscaler"
+    - group: "networking.k8s.io"
+      kind: "Ingress"

@@ -1,0 +1,17 @@
+# คำสั่งสำหรับ Build และนำขึ้น บน docker Repo 
+
+# for production Environment พร้อมใส่เลข tag version กำกับ
+docker buildx build -t docker.io/wachira90/proof-concept:prod1 . --no-cache
+
+# for dev Environment พร้อมใส่เลข tag version กำกับ
+docker buildx build -t docker.io/wachira90/proof-concept:dev1 . --no-cache
+
+# คำสั่ง buildx เป็นคำสั่งที่ใหม่กว่า images บางอย่างหากต้องการไม่เก็บ cache build ให้ใส่คำสั่ง --no-cache
+
+
+
+# การนำ image ขึ้น Repo (ต้อง login ก่อน โดยคำสั่ง "docker login")
+
+docker push docker.io/wachira90/proof-concept:prod1
+
+docker push docker.io/wachira90/proof-concept:dev1

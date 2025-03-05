@@ -1,0 +1,20 @@
+resources:
+  - ../../base
+
+patches:
+  - path: patch.yaml
+    target:
+      kind: Deployment
+      name: myapp
+
+  - path: patch-ingress.yaml
+    target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: ingress-org-service
+
+  - path: patch-hpa.yaml
+    target:
+      kind: HorizontalPodAutoscaler
+      name: myapp-hpa

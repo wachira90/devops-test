@@ -1,0 +1,17 @@
+# TERRAFORM COMMAND 
+
+# โหลด provider ที่จำเป็น
+terraform init
+
+# test validate
+terraform validate
+
+# ตรวจสอบการเปลี่ยนแปลง
+terraform plan
+
+# สร้าง container
+terraform apply -auto-approve
+
+# หากต้องการลบ container และ image สามารถใช้ Terraform ทำลาย resource ได้โดย:
+terraform destroy -auto-approve
+

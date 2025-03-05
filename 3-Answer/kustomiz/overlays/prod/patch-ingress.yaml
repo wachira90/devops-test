@@ -1,0 +1,9 @@
+- op: replace
+  path: /spec/rules/0/host
+  value: kustom-prod.34-124-175-68.nip.io
+  # value: kustom-prod.192-168-1-10.nip.io
+
+- op: replace
+  path: /metadata/name
+  value: ingress-prod-service
+

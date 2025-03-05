@@ -1,0 +1,105 @@
+
+stages:
+  - set-version
+  - pull-code
+  - build-code
+  - login-repo
+  - upload-repo
+  - deploy-kube
+
+before_script:
+  - TAG_VERSION=$(cat version.txt)
+
+variables:
+  REPO_ECR: "docker.io/wachira90"
+  REPO_IMG: "proof-concept"
+  REPO_URL: "ap-southeast-1"
+  DEPLOY_KUBE: "myapp myapp"
+  FILE_PATH: "/home/gitlab-runner/7-solutions/lottery-golang"
+
+set-version:
+  stage: set-version
+  script:
+    - TAG_VERSION=$(cat version.txt)
+    - echo "TAG_VERSION = $TAG_VERSION"
+    - echo "COMMIT value is ${CI_COMMIT_SHA}"
+  tags:
+    - docker-build
+  only:
+    refs:
+      - main
+    changes:
+      - version.txt
+
+pull-code:
+  stage: pull-code
+  script:
+    - echo "this pull-code"
+    - cd ${FILE_PATH}
+    - git pull --no-edit
+    - git status
+    - git show -s 
+  tags:
+    - docker-build
+  only:
+    refs:
+      - main
+    changes:
+      - version.txt
+
+build-code:
+  stage: build-code
+  script:
+    - echo "this build-code ${TAG_VERSION}"
+    - echo "docker build -t ${REPO_ECR}/${REPO_IMG}:${TAG_VERSION} . --no-cache"
+    - cd ${FILE_PATH}
+    - docker build -t ${REPO_ECR}/${REPO_IMG}:${TAG_VERSION} . --no-cache
+  tags:
+    - docker-build
+  only:
+    refs:
+      - main
+    changes:
+      - version.txt
+
+login-repo:
+  stage: login-repo
+  script:
+    - echo "this login-repo $TAG_VERSION"
+    - echo "aws login ecr repo ${REPO_IMG}:${TAG_VERSION}"
+    - docker login --username wachira90 --password ${secret.REPO_PASS}
+  tags:
+    - docker-build
+  only:
+    refs:
+      - main
+    changes:
+      - version.txt
+
+upload-repo:
+  stage: upload-repo
+  script:
+    - echo "this upload-repo $TAG_VERSION"
+    - echo "docker push ${REPO_ECR}/${REPO_IMG}:${TAG_VERSION}"
+    - docker push ${REPO_ECR}/${REPO_IMG}:${TAG_VERSION}
+  tags:
+    - docker-build
+  only:
+    refs:
+      - main
+    changes:
+      - version.txt
+
+deploy-kube:
+  stage: deploy-kube
+  script:
+    - echo "this deploy-kube"
+    - echo "kubectl set image -n prod deploy ${DEPLOY_KUBE}=${REPO_ECR}/${REPO_IMG}:${TAG_VERSION}"
+    - kubectl set image -n prod deploy ${DEPLOY_KUBE}=${REPO_ECR}/${REPO_IMG}:${TAG_VERSION}
+  tags:
+    - gke-cluster
+  only:
+    refs:
+      - main
+    changes:
+      - version.txt
